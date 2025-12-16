@@ -16,14 +16,12 @@ import (
 var _db *gorm.DB
 
 func Database(connRead, connWrite string) {
-	fmt.Println("1111")
 	var ormLogger logger.Interface
 	if gin.Mode() == "debug" {
 		ormLogger = logger.Default.LogMode(logger.Info)
 	} else {
 		ormLogger = logger.Default
 	}
-	fmt.Println("2222")
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       connRead,
 		DefaultStringSize:         256,  //string类型字段默认长度
@@ -37,7 +35,6 @@ func Database(connRead, connWrite string) {
 			SingularTable: true,
 		},
 	})
-	fmt.Println("333")
 	if err != nil {
 		fmt.Println("err", err)
 		return
@@ -54,7 +51,6 @@ func Database(connRead, connWrite string) {
 		Replicas: []gorm.Dialector{mysql.Open(connRead), mysql.Open(connWrite)}, //读操作
 		Policy:   dbresolver.RandomPolicy{},
 	}))
-	fmt.Println("1111")
 	migration()
 }
 func NewDBClient(ctx context.Context) *gorm.DB {
