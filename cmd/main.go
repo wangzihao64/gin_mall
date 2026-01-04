@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"gin_mall/conf"
+	"gin_mall/routes"
 )
 
 func main() {
-	fmt.Println("Hello World")
+	fmt.Println("Start")
 	conf.Init()
-	fmt.Println("Hello World")
+	r := routes.NewRouter()
+	_ = r.Run(conf.HttpPort)
+	fmt.Println("end")
 }
