@@ -74,3 +74,56 @@ func (service UserService) Register(ctx context.Context) serizlizer.Response {
 		Msg:    e.GetMsg(code),
 	}
 }
+func (service *UserService) Login(ctx context.Context) serizlizer.Response {
+	var user *model.User
+	code := e.Success
+	userDao := dao.NewUserDao(ctx)
+	//db := dao.NewDBClient(ctx)
+
+	//err := db.Model(&model.User{}).Where("username = ?", service.UserName).First(&user).Error
+	//if err != nil {
+	//	if errors.Is(err, gorm.ErrRecordNotFound) {
+	//		return serizlizer.Response{}
+	//	}
+	//	return serizlizer.Response{}
+	//}
+
+	//判断用户是否存在
+	user, exist, err := userDao.ExistOrNotByUserName(service.UserName)
+	if !exist || err != nil {
+		code = e.ErrorExistUserNotFound
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Data:   "用户不存在，请先注册",
+		}
+	}
+	//校验密码
+	if user.CheckPassword(service.Password) == false {
+		code = e.ErrorNotCompare
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Data:   "密码错误，请重新登陆",
+		}
+	}
+	//http是一个无状态的协议（认证,token）
+	//token签发
+	token, err := util.GenerateToken(user.ID, service.UserName, 0)
+	if err != nil {
+		code = e.ErrorAuthToken
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Data:   "token error",
+		}
+	}
+	return serizlizer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+		Data: serizlizer.TokenData{
+			Token: token,
+			User:  serizlizer.BuildUser(user),
+		},
+	}
+}
