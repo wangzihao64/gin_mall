@@ -7,6 +7,7 @@ import (
 	"gin_mall/pkg/e"
 	"gin_mall/pkg/util"
 	"gin_mall/serizlizer"
+	"mime/multipart"
 )
 
 type UserService struct {
@@ -125,5 +126,73 @@ func (service *UserService) Login(ctx context.Context) serizlizer.Response {
 			Token: token,
 			User:  serizlizer.BuildUser(user),
 		},
+	}
+}
+
+// Update用户信息修改
+func (service *UserService) Update(ctx context.Context, uId uint) serizlizer.Response {
+	var user *model.User
+	var err error
+	code := e.Success
+	userDao := dao.NewUserDao(ctx)
+	user, err = userDao.GetUserById(uId)
+	//修改昵称nickname
+	if service.NickName != "" {
+		user.NickName = service.NickName
+	}
+	err = userDao.UpdateUserById(uId, user)
+	if err != nil {
+		code = e.Error
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	return serizlizer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+		Data:   serizlizer.BuildUser(user),
+	}
+}
+
+// 头像更新
+func (service *UserService) Post(ctx context.Context, uId uint, file multipart.File, fileSize int64) serizlizer.Response {
+	code := e.Success
+	var user *model.User
+	var err error
+	UserDao := dao.NewUserDao(ctx)
+	user, err = UserDao.GetUserById(uId)
+	if err != nil {
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	//保存图片到本地函数
+	path, err := UploadAvatarToLocalStatic(file, uId, user.Username)
+	if err != nil {
+		code = e.ErrorUploadFail
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	user.Avatar = path
+	err = UserDao.UpdateUserById(uId, user)
+	if err != nil {
+		code = e.Error
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	return serizlizer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+		Data:   serizlizer.BuildUser(user),
 	}
 }
