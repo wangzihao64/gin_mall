@@ -17,6 +17,13 @@ type UserService struct {
 	Key      string `json:"key" form:"key"` //密钥
 }
 
+type SendEmailService struct {
+	Email         string `json:"email" form:"email"`
+	Password      string `json:"password" form:"password"`
+	OperationType uint   `json:"operation_type" form:"operation_type"`
+	//1.绑定邮箱 2.解绑邮箱 3.改密码
+}
+
 func (service UserService) Register(ctx context.Context) serizlizer.Response {
 	var user model.User
 	code := e.Success
@@ -195,4 +202,21 @@ func (service *UserService) Post(ctx context.Context, uId uint, file multipart.F
 		Msg:    e.GetMsg(code),
 		Data:   serizlizer.BuildUser(user),
 	}
+}
+
+// 发送邮箱
+func (service *SendEmailService) Send(ctx context.Context, uId uint) serizlizer.Response {
+	code := e.Success
+	var address string
+	var notice model.Notice //绑定邮箱，修改密码 模版通知
+	token, err := util.GenerateEmailToken(uId, service.OperationType, service.Email, service.Password)
+	if err != nil {
+		code = e.Error
+		return serizlizer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	noticeDao := dao.NewNoticeDao(ctx)
 }
