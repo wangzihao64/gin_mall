@@ -88,7 +88,5 @@ func (k *Encryption) AesDecoding(pwd string) string {
 	return string(dst)
 }
 func (k *Encryption) SetKey(key string) {
-	fmt.Println("SetKey 91")
 	k.key = key
-	fmt.Println("SetKey 93")
 }
