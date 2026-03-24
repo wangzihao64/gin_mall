@@ -26,6 +26,9 @@ func NewRouter() *gin.Engine {
 			//用户操作
 			authed.PUT("user", api.UserUpdate)
 			authed.PUT("avatar", api.UploadAvatar)
+
+			//轮播图
+			v1.GET("carousels", api.ListCarousel)
 			authed.POST("user/sending-email", api.SendEmail)
 			authed.POST("user/valid-email", api.ValidEmail)
 
