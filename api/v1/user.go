@@ -15,6 +15,7 @@ func UserRegister(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, err)
+		util.LogrousObj.Infoln(err)
 	}
 }
 
@@ -24,7 +25,8 @@ func UserLogin(c *gin.Context) {
 		res := userLogin.Login(c.Request.Context())
 		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
+		util.LogrousObj.Infoln(err)
 	}
 }
 func UserUpdate(c *gin.Context) {
@@ -34,7 +36,8 @@ func UserUpdate(c *gin.Context) {
 		res := userUpdate.Update(c.Request.Context(), claims.ID)
 		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
+		util.LogrousObj.Infoln(err)
 	}
 }
 func UploadAvatar(c *gin.Context) {
@@ -46,7 +49,8 @@ func UploadAvatar(c *gin.Context) {
 		res := UploadAvatar.Post(c.Request.Context(), claims.ID, file, filesize)
 		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
+		util.LogrousObj.Infoln(err)
 	}
 }
 func SendEmail(c *gin.Context) {
@@ -56,7 +60,8 @@ func SendEmail(c *gin.Context) {
 		res := sendEmail.Send(c.Request.Context(), claims.ID)
 		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
+		util.LogrousObj.Infoln(err)
 	}
 }
 func ValidEmail(c *gin.Context) {
@@ -65,7 +70,8 @@ func ValidEmail(c *gin.Context) {
 		res := validEmail.Valid(c.Request.Context(), c.GetHeader("Authorization"))
 		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
+		util.LogrousObj.Infoln(err)
 	}
 }
 func ShowMoney(c *gin.Context) {
@@ -75,6 +81,7 @@ func ShowMoney(c *gin.Context) {
 		res := showMoney.Show(c.Request.Context(), claims.ID)
 		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
+		util.LogrousObj.Infoln(err)
 	}
 }
